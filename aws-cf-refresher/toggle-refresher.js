@@ -4,7 +4,7 @@
 // @version      0.1
 // @description  try to take over the world!
 // @author       You
-// @match        https://*.console.aws.amazon.com/cloudformation/home?region=*
+// @match        https://*.console.aws.amazon.com/*/home?region=*
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_log
@@ -22,9 +22,18 @@
     } else {
         GM_log("Start refresher")
         timerId = setInterval(() => {
-            document.querySelectorAll("awsui-button.stacks-refresh-button")
-                .forEach(element => element.firstChild.click())
-        }, 3000)
+            const clickRefreshButtons = (element = document) =>
+                element.querySelectorAll("awsui-button")
+                    .forEach(element => {
+                        const isRefresh = !!element.outerHTML.match(/refresh/i)
+                        isRefresh && element.firstChild.click()
+                    })
+            clickRefreshButtons()
+            document.querySelectorAll("iframe")
+                .forEach(iframe => {
+                    clickRefreshButtons(iframe.contentDocument || iframe.contentWindow.document)
+                })
+        }, 5000)
         GM_setValue("refresher_timer", timerId)
     }
 })();
